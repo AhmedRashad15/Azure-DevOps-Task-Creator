@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Azure-Task-Creator/static/css/main.b0f82848.css",
+    "main.js": "/Azure-Task-Creator/static/js/main.53397995.js",
+    "index.html": "/Azure-Task-Creator/index.html",
+    "main.b0f82848.css.map": "/Azure-Task-Creator/static/css/main.b0f82848.css.map",
+    "main.53397995.js.map": "/Azure-Task-Creator/static/js/main.53397995.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b0f82848.css",
+    "static/js/main.53397995.js"
+  ]
+}
