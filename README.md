@@ -1,164 +1,283 @@
-# Azure Tasks Creator
+# Azure DevOps Tasks Creator
 
-A modern web application that allows you to create multiple tasks as children under user stories in Azure DevOps sprints. This tool streamlines the process of adding standardized tasks across all user stories in a sprint.
+A React web application for efficiently creating multiple tasks as children under user stories within Azure DevOps sprints. This tool streamlines the process of task creation and management for development teams.
 
-## Features
+## 🚀 Features
 
-- 🔐 **Secure Authentication**: Uses Azure DevOps Personal Access Tokens
-- 📋 **Bulk Task Creation**: Create multiple tasks and apply them to all user stories
-- 🎯 **Custom Fields Support**: Add custom fields and values to tasks
-- 📊 **Real-time Results**: View detailed results of task creation operations
-- 🎨 **Modern UI**: Beautiful, responsive interface built with React and Tailwind CSS
-- ⚡ **Fast & Efficient**: Optimized API calls and error handling
+### Core Functionality
+- **Fetch User Stories**: Automatically retrieve user stories from Azure DevOps sprints
+- **Bulk Task Creation**: Create multiple tasks and apply them to all user stories in a sprint
+- **Task Templates**: Save and load reusable task templates
+- **Cross-Device Sync**: Templates saved to Azure DevOps are accessible from any device
+- **Task Management**: Edit, duplicate, and remove tasks with full field support
 
-## Prerequisites
+### Task Management Features
+- **Full Task Editing**: Edit all aspects of existing tasks including title, description, assignments, and custom fields
+- **Task Duplication**: Create copies of tasks with "(Copy)" suffix for quick iteration
+- **Azure DevOps Integration**: Support for all standard Azure DevOps task fields
+- **Custom Fields**: Add custom Azure DevOps fields and values
+- **Assignment Support**: Assign tasks to team members using email addresses
 
-Before using this application, you need:
+### Template System
+- **Dual Storage**: Save templates locally (browser) or in Azure DevOps (cloud)
+- **Template Management**: Load, save, and delete templates
+- **Cross-Device Access**: Templates saved to Azure DevOps sync across all devices
+- **Template Categories**: Organize templates by project or team
 
-1. **Azure DevOps Account**: Access to an Azure DevOps organization and project
-2. **Personal Access Token (PAT)**: Generate a PAT with Work Items (Read & Write) permissions
-3. **Sprint with User Stories**: A sprint containing user stories where you want to add tasks
+## 🛠️ Technology Stack
 
-## Setup Instructions
+- **Frontend**: React 18 with Hooks
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **HTTP Client**: Axios
+- **Build Tool**: Create React App
 
-### 1. Install Dependencies
+## 📋 Prerequisites
 
-```bash
-npm install
+Before using this application, ensure you have:
+
+1. **Azure DevOps Account**: Active Azure DevOps organization and project
+2. **Personal Access Token (PAT)**: Token with Work Items (Read & Write) permissions
+3. **Modern Browser**: Chrome, Firefox, Safari, or Edge
+4. **Node.js**: Version 14 or higher (for development)
+
+## 🔧 Installation
+
+### For Development
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/yourusername/azure-tasks-creator.git
+   cd azure-tasks-creator
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**:
+   ```bash
+   npm start
+   ```
+
+4. **Build for production**:
+   ```bash
+   npm run build
+   ```
+
+### For Production Deployment
+
+1. **Build the application**:
+   ```bash
+   npm run build
+   ```
+
+2. **Serve the build folder**:
+   ```bash
+   npx serve -s build
+   ```
+
+## 🔐 Azure DevOps Setup
+
+### 1. Create Personal Access Token
+
+1. Go to Azure DevOps → User Settings → Personal Access Tokens
+2. Click "New Token"
+3. Configure with the following permissions:
+   - **Work Items**: Read & Write
+   - **Project and Team**: Read
+4. Copy the generated token (you won't see it again)
+
+### 2. Get Your Organization and Project Details
+
+- **Organization**: Your Azure DevOps organization name
+- **Project**: Your project name
+- **Sprint URL**: Copy from your sprint board URL
+
+### Supported URL Formats
+
+The application supports various Azure DevOps URL formats:
+
+```
+# New dev.azure.com format
+https://dev.azure.com/org/project/_sprints/taskboard/team/sprint
+https://dev.azure.com/org/project/_sprints/backlog/team/sprint
+
+# Old visualstudio.com format
+https://org.visualstudio.com/project/_sprints/backlog/team/project/sprint
+
+# Various sprint naming patterns
+- Sprint 1, Sprint 2 (numeric)
+- "sprint 2 M.Q2.25" (complex naming)
 ```
 
-### 2. Start the Development Server
+## 📖 Usage Guide
 
-```bash
-npm start
+### 1. Configure Azure DevOps Settings
+
+1. Enter your **Personal Access Token**
+2. Provide your **Organization Name**
+3. Specify your **Project Name**
+4. Paste your **Sprint URL**
+5. Click "Fetch User Stories"
+
+### 2. Create Tasks
+
+1. **Add Task Details**:
+   - Task Title (required)
+   - Description (optional)
+   - Assigned To (email address)
+   - Azure DevOps fields (Priority, Severity, Estimates, etc.)
+   - Custom fields (advanced)
+
+2. **Task Management**:
+   - **Edit**: Click the blue edit icon (✏️) to modify any task
+   - **Duplicate**: Click the green copy icon (📋) to create a copy
+   - **Remove**: Click the red trash icon (🗑️) to delete a task
+
+### 3. Save and Load Templates
+
+1. **Save Template**:
+   - Create your tasks
+   - Click "Save Template"
+   - Choose storage mode (Azure or Local)
+   - Enter template name
+
+2. **Load Template**:
+   - Click "Load Template"
+   - Select from your saved templates
+   - Modify as needed
+
+### 4. Apply Tasks to User Stories
+
+1. Ensure you have tasks and user stories loaded
+2. Click "Apply Tasks to All User Stories"
+3. Review the results in the modal
+
+## 🔧 Configuration
+
+### Azure DevOps Fields
+
+The application supports these standard Azure DevOps fields:
+
+- **Priority**: 1, 2, 3, 4
+- **Severity**: Critical, High, Medium, Low
+- **Original Estimate**: Hours
+- **Remaining Work**: Hours
+- **Completed Work**: Hours
+- **Activity**: Development, Design, Documentation, Testing, Deployment, Requirements
+- **Discipline**: Development, Test, User Experience, Database, Requirements
+- **Tags**: Custom tags
+
+### Custom Fields
+
+Add any custom Azure DevOps field using the format:
+```
+Microsoft.VSTS.Common.CustomFieldName
 ```
 
-The application will open in your browser at `http://localhost:3000`.
+## 🚀 Deployment Options
 
-## How to Use
+### GitHub Pages
 
-### Step 1: Generate a Personal Access Token
+1. **Add homepage to package.json**:
+   ```json
+   {
+     "homepage": "https://yourusername.github.io/azure-tasks-creator"
+   }
+   ```
 
-1. Go to your Azure DevOps organization
-2. Click on your profile picture → **Personal access tokens**
-3. Click **New Token**
-4. Configure the token:
-   - **Name**: Give it a descriptive name (e.g., "Tasks Creator")
-   - **Organization**: Select your organization
-   - **Expiration**: Choose an appropriate expiration date
-   - **Scopes**: Select **Custom defined** and ensure **Work Items (Read & Write)** is enabled
-5. Click **Create** and copy the token
+2. **Install gh-pages**:
+   ```bash
+   npm install --save-dev gh-pages
+   ```
 
-### Step 2: Get Your Sprint URL
+3. **Add deploy script to package.json**:
+   ```json
+   {
+     "scripts": {
+       "predeploy": "npm run build",
+       "deploy": "gh-pages -d build"
+     }
+   }
+   ```
 
-1. Navigate to your Azure DevOps project
-2. Go to **Boards** → **Sprints**
-3. Select the sprint you want to work with
-4. Copy the URL from your browser's address bar
+4. **Deploy**:
+   ```bash
+   npm run deploy
+   ```
 
-The URL should look like:
-```
-https://dev.azure.com/organization/project/_sprints/taskboard/team/sprint
-```
+### Netlify
 
-### Step 3: Use the Application
+1. **Build the project**:
+   ```bash
+   npm run build
+   ```
 
-1. **Enter your Personal Access Token** in the first field
-2. **Paste your Sprint URL** in the second field
-3. **Click "Fetch User Stories"** to load all user stories from the sprint
-4. **Add Tasks** using the task form:
-   - Enter task title (required)
-   - Add description (optional)
-   - Add custom fields (optional)
-5. **Click "Apply Tasks to All User Stories"** to create the tasks
+2. **Drag and drop** the `build` folder to Netlify
 
-## Custom Fields
+### Vercel
 
-You can add custom fields to your tasks by specifying the field name and value. Common Azure DevOps field names include:
+1. **Connect your GitHub repository** to Vercel
+2. **Deploy automatically** on push to main branch
 
-- `Microsoft.VSTS.Common.Priority` - Task priority
-- `Microsoft.VSTS.Common.Severity` - Task severity
-- `Microsoft.VSTS.Scheduling.OriginalEstimate` - Original time estimate
-- `Microsoft.VSTS.Scheduling.RemainingWork` - Remaining work
-- `System.Tags` - Tags for the task
+## 🔒 Security Considerations
 
-## API Reference
+- **Personal Access Tokens**: Never commit tokens to version control
+- **Environment Variables**: Use `.env` files for sensitive data in development
+- **HTTPS**: Always use HTTPS in production
+- **Token Permissions**: Use minimal required permissions for PATs
 
-The application uses the Azure DevOps REST API v7.0. Key endpoints used:
-
-- **Work Item Query Language (WIQL)**: To fetch user stories from a sprint
-- **Work Items API**: To get detailed work item information
-- **Work Items Creation**: To create new tasks with parent-child relationships
-
-## Error Handling
-
-The application provides comprehensive error handling for:
-
-- Invalid access tokens
-- Incorrect sprint URLs
-- Network connectivity issues
-- API permission errors
-- Invalid field names or values
-
-## Security Notes
-
-- **Never share your Personal Access Token**
-- **Use tokens with minimal required permissions**
-- **Set appropriate expiration dates for tokens**
-- **The application runs entirely in your browser** - no data is sent to external servers
-
-## Troubleshooting
+## 🐛 Troubleshooting
 
 ### Common Issues
 
 1. **"Failed to fetch user stories"**
-   - Check your Personal Access Token permissions
-   - Verify the sprint URL is correct
-   - Ensure the sprint contains user stories
+   - Check your PAT permissions
+   - Verify organization and project names
+   - Ensure sprint URL is correct
 
-2. **"No user stories found"**
-   - Confirm the sprint URL points to a sprint with user stories
-   - Check that user stories are assigned to the sprint
+2. **"Template save failed"**
+   - Verify PAT has Work Items permissions
+   - Check project name spelling
+   - Try local storage as fallback
 
-3. **"Failed to create task"**
-   - Verify your PAT has Write permissions for Work Items
-   - Check custom field names are valid for your Azure DevOps process
+3. **"No user stories found"**
+   - Verify sprint URL format
+   - Check if sprint contains user stories
+   - Ensure team context is correct
 
-### Getting Help
+### Debug Mode
 
-If you encounter issues:
+Enable console logging by opening browser developer tools (F12) to see detailed API calls and error messages.
 
-1. Check the browser's developer console for detailed error messages
-2. Verify your Azure DevOps permissions
-3. Test with a simple task first (no custom fields)
+## 🤝 Contributing
 
-## Development
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### Project Structure
+## 📝 License
 
-```
-src/
-├── components/          # React components
-│   ├── TaskForm.js     # Task creation form
-│   ├── UserStoriesList.js # User stories display
-│   └── ResultsModal.js # Results modal
-├── services/           # API services
-│   └── azureDevOps.js  # Azure DevOps API integration
-├── App.js             # Main application component
-└── index.js           # Application entry point
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### Technologies Used
+## 🙏 Acknowledgments
 
-- **React 18**: Modern React with hooks
-- **Tailwind CSS**: Utility-first CSS framework
-- **Axios**: HTTP client for API calls
-- **Lucide React**: Icon library
+- Azure DevOps REST API
+- React community
+- Tailwind CSS team
+- Lucide React icons
 
-## License
+## 📞 Support
 
-This project is open source and available under the MIT License.
+For issues and questions:
+1. Check the troubleshooting section
+2. Review Azure DevOps documentation
+3. Open an issue on GitHub
 
-## Contributing
+---
 
-Contributions are welcome! Please feel free to submit a Pull Request. 
+**Note**: This application is designed for Azure DevOps and requires appropriate permissions to function correctly. 
