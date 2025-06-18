@@ -280,4 +280,4 @@ For issues and questions:
 
 ---
 
-**Note**: This application is designed for Azure DevOps and requires appropriate permissions to function correctly. 
+**Note**: This application is designed for Azure DevOps and requires appropriate permissions to function correctly.
