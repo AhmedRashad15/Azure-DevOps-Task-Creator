@@ -2,7 +2,7 @@
   "name": "azure-tasks-creator",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://AhmedRashad15.github.io/Azure-Task-Creator",
+  "homepage": "https://AhmedRashad15.github.io/Azure-DevOps-Task-Creator",
   "description": "Create tasks as children under user stories in Azure DevOps sprints",
   "main": "index.js",
   "scripts": {

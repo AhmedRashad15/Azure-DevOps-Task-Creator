@@ -21,6 +21,7 @@ function App() {
   const [showUrlHelp, setShowUrlHelp] = useState(false);
   const [azureService, setAzureService] = useState(null);
   const [isAzureConnected, setIsAzureConnected] = useState(false);
+  const [selectedUserStoryIds, setSelectedUserStoryIds] = useState([]);
 
   const fetchUserStories = async () => {
     if (!accessToken.trim() || !organization.trim() || !project.trim() || !sprintUrl.trim()) {
@@ -73,17 +74,19 @@ function App() {
     setError('');
 
     try {
-      // Extract team name and sprint name from URL to construct paths
-      const { sprintName, teamName } = AzureDevOpsService.extractSprintName(sprintUrl);
-      const areaPath = teamName ? `${project}\\${teamName}` : project;
+      // Extract sprint name from URL to construct paths
+      const { sprintName } = AzureDevOpsService.extractSprintName(sprintUrl);
+      const areaPath = project; // Always just the project name
       const iterationPath = `${project}\\${sprintName}`;
+      console.log('DEBUG: Using areaPath:', areaPath, 'iterationPath:', iterationPath);
 
-      console.log('Creating tasks with paths:');
-      console.log('Area path:', areaPath);
-      console.log('Iteration path:', iterationPath);
+      // Determine which user stories to apply tasks to
+      const storiesToApply = selectedUserStoryIds.length > 0
+        ? userStories.filter(story => selectedUserStoryIds.includes(story.id))
+        : userStories;
 
-      // Create tasks for all user stories with correct paths
-      const results = await azureService.createTasksForAllUserStories(userStories, tasks, areaPath, iterationPath);
+      // Create tasks for selected user stories with correct paths
+      const results = await azureService.createTasksForAllUserStories(storiesToApply, tasks, areaPath, iterationPath);
       setResults(results);
       setShowResults(true);
 
@@ -297,7 +300,7 @@ function App() {
                   ) : (
                     <>
                       <Play size={20} />
-                      Apply Tasks to All User Stories
+                      Apply Tasks to Selected User Stories
                     </>
                   )}
                 </button>
@@ -315,6 +318,8 @@ function App() {
               loading={loading} 
               error={error} 
               onRemoveUserStory={handleRemoveUserStory}
+              selectedUserStoryIds={selectedUserStoryIds}
+              setSelectedUserStoryIds={setSelectedUserStoryIds}
             />
           </div>
         </div>

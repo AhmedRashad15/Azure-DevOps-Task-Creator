@@ -30,91 +30,51 @@ class AzureDevOpsService {
     try {
       const url = new URL(sprintUrl);
       const pathParts = url.pathname.split('/').filter(part => part.length > 0);
-      
-      console.log('URL path parts:', pathParts);
-      
-      // Handle both old visualstudio.com and new dev.azure.com formats
-      // For visualstudio.com: /organization/project/_sprints/backlog/team/project/sprint
-      // For dev.azure.com: /organization/project/_sprints/backlog/team/sprint
-      
-      // Extract team name if available - be more careful about the structure
-      let teamName = null;
+
       const backlogIndex = pathParts.findIndex(part => part.toLowerCase() === 'backlog');
       const taskboardIndex = pathParts.findIndex(part => part.toLowerCase() === 'taskboard');
-      const sprintIndex = pathParts.findIndex(part => 
-        part.toLowerCase().includes('sprint') || 
-        part.match(/^sprint\s+\d+/i) ||
-        part.match(/sprint.*\d+.*\d+\.\d+/i)
-      );
-      
-      // Find team name between backlog/taskboard and sprint
-      if ((backlogIndex !== -1 || taskboardIndex !== -1) && sprintIndex !== -1) {
-        const startIndex = Math.max(backlogIndex, taskboardIndex) + 1;
-        const endIndex = sprintIndex;
-        
-        if (startIndex < endIndex) {
-          // For old format: /project/_sprints/backlog/team/project/sprint
-          // For new format: /project/_sprints/backlog/team/sprint
-          const potentialTeamName = decodeURIComponent(pathParts[startIndex]);
-          
-          // Validate that this looks like a team name (not a project name)
-          if (potentialTeamName && 
-              !potentialTeamName.toLowerCase().includes('project') &&
-              !potentialTeamName.toLowerCase().includes('leasing') &&
-              potentialTeamName.length > 0) {
-            teamName = potentialTeamName;
-            console.log('Extracted team name:', teamName);
-          }
+      const startIndex = Math.max(backlogIndex, taskboardIndex);
+      // Use the last occurrence of a part containing 'sprint' for sprintIndex
+      const sprintIndex = (() => {
+        for (let i = pathParts.length - 1; i >= 0; i--) {
+          if (pathParts[i].toLowerCase().includes('sprint')) return i;
         }
-      }
-      
-      // Find the sprint part in the path - look for the last part that could be a sprint
-      let sprintName = null;
-      
-      // Try to find sprint by looking for patterns - start from the end
-      for (let i = pathParts.length - 1; i >= 0; i--) {
-        const part = decodeURIComponent(pathParts[i]);
-        console.log(`Checking part ${i}: "${part}"`);
-        
-        // Check if this part looks like a sprint name
-        if (part.toLowerCase().includes('sprint') || 
-            part.match(/^sprint\s+\d+/i) ||
-            part.match(/sprint.*\d+.*\d+\.\d+/i) ||
-            part.match(/sprint.*\d+.*[MQ]\d+\.\d+/i)) { // For formats like "sprint 2 M.Q2.25"
-          sprintName = part;
-          console.log('Found sprint pattern in part:', part);
-          break;
+        return -1;
+      })();
+
+      let teamName = null;
+      if (startIndex !== -1 && sprintIndex !== -1 && sprintIndex > startIndex + 1) {
+        let teamParts = pathParts.slice(startIndex + 1, sprintIndex);
+        // Remove project name if it is the last part before the sprint
+        if (
+          teamParts.length > 1 &&
+          teamParts[teamParts.length - 1].toLowerCase() === pathParts[0].toLowerCase()
+        ) {
+          teamParts = teamParts.slice(0, -1);
         }
-      }
-      
-      // If no sprint pattern found, try the last part of the URL
-      if (!sprintName && pathParts.length > 0) {
-        const lastPart = decodeURIComponent(pathParts[pathParts.length - 1]);
-        console.log('Checking last part as fallback:', lastPart);
-        // Skip common non-sprint parts
-        if (!['backlog', 'taskboard', 'board', 'team', 'leasing'].includes(lastPart.toLowerCase())) {
-          sprintName = lastPart;
-          console.log('Using last part as sprint name:', lastPart);
+        if (teamParts.length > 0) {
+          teamName = teamParts.map(decodeURIComponent).join('\\');
         }
+        // DEBUG LOGGING
+        console.log('DEBUG extractSprintName:', {
+          pathParts,
+          startIndex,
+          sprintIndex,
+          teamParts,
+          teamName
+        });
+      } else {
+        // DEBUG LOGGING
+        console.log('DEBUG extractSprintName (no team):', {
+          pathParts,
+          startIndex,
+          sprintIndex
+        });
       }
-      
-      if (sprintName) {
-        console.log('Extracted sprint name:', sprintName);
-        return { sprintName, teamName };
-      }
-      
-      // If still no sprint name found, show all parts for debugging
-      console.log('Could not extract sprint name. All URL parts:');
-      pathParts.forEach((part, index) => {
-        console.log(`${index}: "${part}" -> "${decodeURIComponent(part)}"`);
-      });
-      
-      throw new Error(`Could not extract sprint name from URL. Please ensure you're using a valid Azure DevOps sprint URL.`);
-      
+
+      const sprintName = decodeURIComponent(pathParts[pathParts.length - 1]);
+      return { sprintName, teamName };
     } catch (error) {
-      if (error.message.includes('Could not extract sprint name')) {
-        throw error;
-      }
       throw new Error('Invalid URL format. Please provide a valid Azure DevOps sprint URL.');
     }
   }
@@ -128,6 +88,7 @@ class AzureDevOpsService {
 
       // First, get all iterations to find the correct one
       let targetIteration = null;
+      let allIterations = []; // Declare allIterations in function scope
       
       try {
         const iterationsResponse = await this.api.get('/_apis/work/teamsettings/iterations', {
@@ -142,7 +103,7 @@ class AzureDevOpsService {
         })));
         
         // Find the iteration that matches our sprint name - be more precise
-        const allIterations = iterationsResponse.data.value;
+        allIterations = iterationsResponse.data.value; // Assign to the function-scoped variable
         console.log('Available iterations:', allIterations.map(iter => ({
           name: iter.name,
           path: iter.path
@@ -292,26 +253,11 @@ class AzureDevOpsService {
 
       // Build the WIQL query with the correct area path and iteration path
       // Construct the paths based on the extracted team name and sprint name
-      const areaPath = teamName ? `${this.project}\\${teamName}` : this.project;
+      const areaPath = this.project; // Always just the project name
       const iterationPath = `${this.project}\\${sprintName}`;
-      
-      let query = `SELECT [System.Id], [System.Title], [System.State] FROM WorkItems WHERE [System.TeamProject] = '${this.project}' AND [System.WorkItemType] = 'User Story' AND [System.IterationPath] = '${iterationPath}'`;
-      
-      // Add team filtering if team name is available and valid
-      if (teamName && teamName.trim() && 
-          !teamName.toLowerCase().includes('project') &&
-          !teamName.toLowerCase().includes('leasing') &&
-          teamName.length > 0) {
-        query += ` AND [System.AreaPath] UNDER '${areaPath}'`;
-        console.log('Adding team filter for area path:', areaPath);
-      } else {
-        console.log('Skipping team filter - team name not available or invalid:', teamName);
-      }
-      
-      query += ` ORDER BY [System.Id]`;
+      let query = `SELECT [System.Id], [System.Title], [System.State] FROM WorkItems WHERE [System.TeamProject] = '${this.project}' AND [System.WorkItemType] = 'User Story' AND [System.IterationPath] = '${iterationPath}' AND [System.AreaPath] UNDER '${areaPath}' ORDER BY [System.Id]`;
       
       console.log('Using WIQL query:', query);
-      console.log('Team context:', teamName);
       console.log('Constructed area path:', areaPath);
       console.log('Constructed iteration path:', iterationPath);
       console.log('Final query:', query);
@@ -417,7 +363,8 @@ class AzureDevOpsService {
         state: workItem.fields['System.State'],
         workItemType: workItem.fields['System.WorkItemType'],
         url: workItem.url,
-        iterationPath: workItem.fields['System.IterationPath'] || ''
+        iterationPath: workItem.fields['System.IterationPath'] || '',
+        areaPath: workItem.fields['System.AreaPath'] || ''
       }));
     } catch (error) {
       console.error('Error fetching work item details:', error);
@@ -428,6 +375,8 @@ class AzureDevOpsService {
   // Create a task as a child of a user story
   async createTask(userStoryId, taskData, areaPath = null, iterationPath = null) {
     try {
+      // Debug log
+      console.log('createTask called with areaPath:', areaPath, 'iterationPath:', iterationPath);
       const taskPayload = [
         {
           op: 'add',
@@ -513,11 +462,13 @@ class AzureDevOpsService {
   // Create multiple tasks for all user stories
   async createTasksForAllUserStories(userStories, tasks, areaPath = null, iterationPath = null) {
     const results = [];
-    
     for (const userStory of userStories) {
       for (const task of tasks) {
         try {
-          const createdTask = await this.createTask(userStory.id, task, areaPath, iterationPath);
+          // Use the project name as areaPath and constructed iterationPath
+          const usedAreaPath = areaPath;
+          const usedIterationPath = iterationPath;
+          const createdTask = await this.createTask(userStory.id, task, usedAreaPath, usedIterationPath);
           results.push({
             userStoryId: userStory.id,
             userStoryTitle: userStory.title,
@@ -536,7 +487,6 @@ class AzureDevOpsService {
         }
       }
     }
-    
     return results;
   }
 

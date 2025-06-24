@@ -47,8 +47,8 @@ Before using this application, ensure you have:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/azure-tasks-creator.git
-   cd azure-tasks-creator
+   git clone https://github.com/AhmedRashad15/Azure-DevOps-Task-Creator.git
+   cd Azure-DevOps-Task-Creator
    ```
 
 2. **Install dependencies**:
@@ -184,7 +184,7 @@ Microsoft.VSTS.Common.CustomFieldName
 1. **Add homepage to package.json**:
    ```json
    {
-     "homepage": "https://yourusername.github.io/azure-tasks-creator"
+     "homepage": "https://AhmedRashad15.github.io/Azure-DevOps-Task-Creator"
    }
    ```
 
@@ -281,3 +281,6 @@ For issues and questions:
 ---
 
 **Note**: This application is designed for Azure DevOps and requires appropriate permissions to function correctly.
+
+The project will be available at:
+https://AhmedRashad15.github.io/Azure-DevOps-Task-Creator
