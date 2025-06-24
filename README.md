@@ -24,98 +24,9 @@ A React web application for efficiently creating multiple tasks as children unde
 - **Cross-Device Access**: Templates saved to Azure DevOps sync across all devices
 - **Template Categories**: Organize templates by project or team
 
-## 🛠️ Technology Stack
-
-- **Frontend**: React 18 with Hooks
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **HTTP Client**: Axios
-- **Build Tool**: Create React App
-
-## 📋 Prerequisites
-
-Before using this application, ensure you have:
-
-1. **Azure DevOps Account**: Active Azure DevOps organization and project
-2. **Personal Access Token (PAT)**: Token with Work Items (Read & Write) permissions
-3. **Modern Browser**: Chrome, Firefox, Safari, or Edge
-4. **Node.js**: Version 14 or higher (for development)
-
-## 🔧 Installation
-
-### For Development
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/AhmedRashad15/Azure-DevOps-Task-Creator.git
-   cd Azure-DevOps-Task-Creator
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**:
-   ```bash
-   npm start
-   ```
-
-4. **Build for production**:
-   ```bash
-   npm run build
-   ```
-
-### For Production Deployment
-
-1. **Build the application**:
-   ```bash
-   npm run build
-   ```
-
-2. **Serve the build folder**:
-   ```bash
-   npx serve -s build
-   ```
-
-## 🔐 Azure DevOps Setup
-
-### 1. Create Personal Access Token
-
-1. Go to Azure DevOps → User Settings → Personal Access Tokens
-2. Click "New Token"
-3. Configure with the following permissions:
-   - **Work Items**: Read & Write
-   - **Project and Team**: Read
-4. Copy the generated token (you won't see it again)
-
-### 2. Get Your Organization and Project Details
-
-- **Organization**: Your Azure DevOps organization name
-- **Project**: Your project name
-- **Sprint URL**: Copy from your sprint board URL
-
-### Supported URL Formats
-
-The application supports various Azure DevOps URL formats:
-
-```
-# New dev.azure.com format
-https://dev.azure.com/org/project/_sprints/taskboard/team/sprint
-https://dev.azure.com/org/project/_sprints/backlog/team/sprint
-
-# Old visualstudio.com format
-https://org.visualstudio.com/project/_sprints/backlog/team/project/sprint
-
-# Various sprint naming patterns
-- Sprint 1, Sprint 2 (numeric)
-- "sprint 2 M.Q2.25" (complex naming)
-```
-
 ## 📖 Usage Guide
 
 ### 1. Configure Azure DevOps Settings
-
 1. Enter your **Personal Access Token**
 2. Provide your **Organization Name**
 3. Specify your **Project Name**
@@ -123,37 +34,32 @@ https://org.visualstudio.com/project/_sprints/backlog/team/project/sprint
 5. Click "Fetch User Stories"
 
 ### 2. Create Tasks
-
 1. **Add Task Details**:
    - Task Title (required)
    - Description (optional)
    - Assigned To (email address)
    - Azure DevOps fields (Priority, Severity, Estimates, etc.)
    - Custom fields (advanced)
-
 2. **Task Management**:
    - **Edit**: Click the blue edit icon (✏️) to modify any task
    - **Duplicate**: Click the green copy icon (📋) to create a copy
    - **Remove**: Click the red trash icon (🗑️) to delete a task
 
 ### 3. Save and Load Templates
-
 1. **Save Template**:
    - Create your tasks
    - Click "Save Template"
    - Choose storage mode (Azure or Local)
    - Enter template name
-
 2. **Load Template**:
    - Click "Load Template"
    - Select from your saved templates
    - Modify as needed
 
 ### 4. Apply Tasks to User Stories
-
 1. Ensure you have tasks and user stories loaded
 2. Click "Apply Tasks to All User Stories"
-3. **Review the results** in the modal
+3. **Review the results** in the modal.
 
 ## 🧠 How It Works: The Smart Fetching Logic
 
@@ -162,23 +68,98 @@ The most complex part of this tool is reliably fetching user stories, because di
 The key is that the tool can't just guess the `iterationPath` and `areaPath`. It has to be smart and let Azure DevOps tell us the correct values. The process follows these steps:
 
 1.  **Get Team-Specific Sprints:** First, we get the `teamName` from the URL. We use it to make a targeted API call that asks Azure DevOps, 'Give me the list of sprints that belong to *this specific team*.' This is the most important step and ensures we are always looking in the right place.
-
 2.  **Find the Correct Sprint:** Next, we find the correct sprint in that list, using the name from the URL. This gives us the **official and complete `iterationPath`**, which might be complex like `Leasing\Revamp Iterations\Leasing Revamp Sprint 19`. We don't have to guess anymore.
-
 3.  **Handle the Area Path (The Fallback Logic):** This is the final piece of the puzzle. We know some teams have a valid `Area Path` and some don't.
     *   **Attempt 1:** The tool first tries a query using the specific area path, like `Home Insurance\Home Insurance Team`.
     *   **Attempt 2 (The Fallback):** If that fails with a very specific "Area Path does not exist" error, the tool knows it's a special case. It automatically retries the query *without* the area path filter. This allows it to handle both types of teams without breaking either one.
-
 4.  **Create Tasks Consistently:** Once we have the final list of user stories, we grab the `areaPath` and `iterationPath` from the first story and use those for every single sub-task we create. This ensures all new tasks land in the exact same sprint and team area as the parent story.
 
 This logic makes the application robust enough to handle the different ways our teams are configured in Azure DevOps.
 
-## 🔧 Configuration
+## 🔧 Getting Started (Installation & Setup)
 
-### Azure DevOps Fields
+### Prerequisites
+Before using this application, ensure you have:
+1. **Azure DevOps Account**: Active Azure DevOps organization and project
+2. **Personal Access Token (PAT)**: Token with Work Items (Read & Write) permissions
+3. **Modern Browser**: Chrome, Firefox, Safari, or Edge
+4. **Node.js**: Version 14 or higher (for development)
 
+### Installation for Development
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/AhmedRashad15/Azure-DevOps-Task-Creator.git
+   cd Azure-DevOps-Task-Creator
+   ```
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+3. **Start the development server**:
+   ```bash
+   npm start
+   ```
+
+### Azure DevOps Setup
+1. **Create Personal Access Token**:
+   - Go to Azure DevOps → User Settings → Personal Access Tokens
+   - Click "New Token"
+   - Configure with the following permissions:
+     - **Work Items**: Read & Write
+     - **Project and Team**: Read
+   - Copy the generated token (you won't see it again).
+2. **Get Your Organization and Project Details**:
+   - **Organization**: Your Azure DevOps organization name.
+   - **Project**: Your project name.
+   - **Sprint URL**: Copy from your sprint board URL.
+
+## 🚀 Deployment Options
+
+### GitHub Pages
+1. **Add homepage to package.json**:
+   ```json
+   {
+     "homepage": "https://AhmedRashad15.github.io/Azure-DevOps-Task-Creator"
+   }
+   ```
+2. **Install gh-pages**:
+   ```bash
+   npm install --save-dev gh-pages
+   ```
+3. **Add deploy script to package.json**:
+   ```json
+   {
+     "scripts": {
+       "predeploy": "npm run build",
+       "deploy": "gh-pages -d build"
+     }
+   }
+   ```
+4. **Deploy**:
+   ```bash
+   npm run deploy
+   ```
+
+### Other Options (Netlify, Vercel)
+- **Build the project**: `npm run build`
+- For **Netlify**, drag and drop the `build` folder.
+- For **Vercel**, connect your GitHub repository for automatic deployments.
+
+## ⚙️ Advanced Configuration
+
+### Supported URL Formats
+The application supports various Azure DevOps URL formats:
+```
+# New dev.azure.com format
+https://dev.azure.com/org/project/_sprints/taskboard/team/sprint
+https://dev.azure.com/org/project/_sprints/backlog/team/sprint
+
+# Old visualstudio.com format
+https://org.visualstudio.com/project/_sprints/backlog/team/project/sprint
+```
+
+### Supported Azure DevOps Fields
 The application supports these standard Azure DevOps fields:
-
 - **Priority**: 1, 2, 3, 4
 - **Severity**: Critical, High, Medium, Low
 - **Original Estimate**: Hours
@@ -189,116 +170,31 @@ The application supports these standard Azure DevOps fields:
 - **Tags**: Custom tags
 
 ### Custom Fields
-
 Add any custom Azure DevOps field using the format:
 ```
 Microsoft.VSTS.Common.CustomFieldName
 ```
 
-## 🚀 Deployment Options
+## 🛠️ Technology Stack
 
-### GitHub Pages
-
-1. **Add homepage to package.json**:
-   ```json
-   {
-     "homepage": "https://AhmedRashad15.github.io/Azure-DevOps-Task-Creator"
-   }
-   ```
-
-2. **Install gh-pages**:
-   ```bash
-   npm install --save-dev gh-pages
-   ```
-
-3. **Add deploy script to package.json**:
-   ```json
-   {
-     "scripts": {
-       "predeploy": "npm run build",
-       "deploy": "gh-pages -d build"
-     }
-   }
-   ```
-
-4. **Deploy**:
-   ```bash
-   npm run deploy
-   ```
-
-### Netlify
-
-1. **Build the project**:
-   ```bash
-   npm run build
-   ```
-
-2. **Drag and drop** the `build` folder to Netlify
-
-### Vercel
-
-1. **Connect your GitHub repository** to Vercel
-2. **Deploy automatically** on push to main branch
+- **Frontend**: React 18 with Hooks
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **HTTP Client**: Axios
+- **Build Tool**: Create React App
 
 ## 🔒 Security Considerations
 
-- **Personal Access Tokens**: Never commit tokens to version control
-- **Environment Variables**: Use `.env` files for sensitive data in development
-- **HTTPS**: Always use HTTPS in production
-- **Token Permissions**: Use minimal required permissions for PATs
+- **Personal Access Tokens**: Never commit tokens to version control. Use `.env` files for sensitive data in development.
+- **Token Permissions**: Use the minimal required permissions for PATs.
+- **HTTPS**: Always use HTTPS in production.
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
-
-1. **"Failed to fetch user stories"**
-   - Check your PAT permissions
-   - Verify organization and project names
-   - Ensure sprint URL is correct
-
-2. **"Template save failed"**
-   - Verify PAT has Work Items permissions
-   - Check project name spelling
-   - Try local storage as fallback
-
-3. **"No user stories found"**
-   - Verify sprint URL format
-   - Check if sprint contains user stories
-   - Ensure team context is correct
+1. **"Failed to fetch user stories"**: Check your PAT permissions, organization/project names, and sprint URL.
+2. **"Template save failed"**: Verify PAT has Work Items (Read & Write) permissions and check project name.
+3. **"No user stories found"**: Verify sprint URL format and ensure the sprint contains user stories.
 
 ### Debug Mode
-
 Enable console logging by opening browser developer tools (F12) to see detailed API calls and error messages.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Azure DevOps REST API
-- React community
-- Tailwind CSS team
-- Lucide React icons
-
-## 📞 Support
-
-For issues and questions:
-1. Check the troubleshooting section
-2. Review Azure DevOps documentation
-3. Open an issue on GitHub
-
----
-
-**Note**: This application is designed for Azure DevOps and requires appropriate permissions to function correctly.
-
-The project will be available at:
-https://AhmedRashad15.github.io/Azure-DevOps-Task-Creator
