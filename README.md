@@ -153,7 +153,25 @@ https://org.visualstudio.com/project/_sprints/backlog/team/project/sprint
 
 1. Ensure you have tasks and user stories loaded
 2. Click "Apply Tasks to All User Stories"
-3. Review the results in the modal
+3. **Review the results** in the modal
+
+## 🧠 How It Works: The Smart Fetching Logic
+
+The most complex part of this tool is reliably fetching user stories, because different teams in Azure DevOps can have very different project structures. Here's a simple explanation of how we solved it:
+
+The key is that the tool can't just guess the `iterationPath` and `areaPath`. It has to be smart and let Azure DevOps tell us the correct values. The process follows these steps:
+
+1.  **Get Team-Specific Sprints:** First, we get the `teamName` from the URL. We use it to make a targeted API call that asks Azure DevOps, 'Give me the list of sprints that belong to *this specific team*.' This is the most important step and ensures we are always looking in the right place.
+
+2.  **Find the Correct Sprint:** Next, we find the correct sprint in that list, using the name from the URL. This gives us the **official and complete `iterationPath`**, which might be complex like `Leasing\Revamp Iterations\Leasing Revamp Sprint 19`. We don't have to guess anymore.
+
+3.  **Handle the Area Path (The Fallback Logic):** This is the final piece of the puzzle. We know some teams have a valid `Area Path` and some don't.
+    *   **Attempt 1:** The tool first tries a query using the specific area path, like `Home Insurance\Home Insurance Team`.
+    *   **Attempt 2 (The Fallback):** If that fails with a very specific "Area Path does not exist" error, the tool knows it's a special case. It automatically retries the query *without* the area path filter. This allows it to handle both types of teams without breaking either one.
+
+4.  **Create Tasks Consistently:** Once we have the final list of user stories, we grab the `areaPath` and `iterationPath` from the first story and use those for every single sub-task we create. This ensures all new tasks land in the exact same sprint and team area as the parent story.
+
+This logic makes the application robust enough to handle the different ways our teams are configured in Azure DevOps.
 
 ## 🔧 Configuration
 
