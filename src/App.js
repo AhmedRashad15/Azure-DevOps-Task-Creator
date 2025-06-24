@@ -74,19 +74,13 @@ function App() {
     setError('');
 
     try {
-      // Extract sprint name from URL to construct paths
-      const { sprintName } = AzureDevOpsService.extractSprintName(sprintUrl);
-      const areaPath = project; // Always just the project name
-      const iterationPath = `${project}\\${sprintName}`;
-      console.log('DEBUG: Using areaPath:', areaPath, 'iterationPath:', iterationPath);
-
       // Determine which user stories to apply tasks to
       const storiesToApply = selectedUserStoryIds.length > 0
         ? userStories.filter(story => selectedUserStoryIds.includes(story.id))
         : userStories;
 
-      // Create tasks for selected user stories with correct paths
-      const results = await azureService.createTasksForAllUserStories(storiesToApply, tasks, areaPath, iterationPath);
+      // Create tasks for selected user stories. The service now handles getting the correct paths.
+      const results = await azureService.createTasksForAllUserStories(storiesToApply, tasks);
       setResults(results);
       setShowResults(true);
 
