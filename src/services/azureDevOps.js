@@ -267,15 +267,22 @@ class AzureDevOpsService {
   }
 
   // Create multiple tasks for all user stories
-  async createTasksForAllUserStories(userStories, tasks, areaPath = null, iterationPath = null) {
+  async createTasksForAllUserStories(userStories, tasks) {
+    if (!userStories || userStories.length === 0) {
+      return []; // Nothing to do if there are no user stories
+    }
+
+    // Get the iteration and area path from the first user story.
+    // We assume all user stories in the list share the same context from the sprint.
+    const { areaPath, iterationPath } = userStories[0];
+    console.log(`Using Area Path: "${areaPath}" and Iteration Path: "${iterationPath}" for all created tasks.`);
+
     const results = [];
     for (const userStory of userStories) {
       for (const task of tasks) {
         try {
-          // Use the project name as areaPath and constructed iterationPath
-          const usedAreaPath = areaPath;
-          const usedIterationPath = iterationPath;
-          const createdTask = await this.createTask(userStory.id, task, usedAreaPath, usedIterationPath);
+          // Use the unified paths derived from the first user story for all tasks
+          const createdTask = await this.createTask(userStory.id, task, areaPath, iterationPath);
           results.push({
             userStoryId: userStory.id,
             userStoryTitle: userStory.title,
