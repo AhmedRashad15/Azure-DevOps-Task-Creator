@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/Azure-DevOps-Task-Creator/static/css/main.b44d70b0.css",
-    "main.js": "/Azure-DevOps-Task-Creator/static/js/main.64cd249d.js",
+    "main.js": "/Azure-DevOps-Task-Creator/static/js/main.c4354ee9.js",
     "index.html": "/Azure-DevOps-Task-Creator/index.html",
     "main.b44d70b0.css.map": "/Azure-DevOps-Task-Creator/static/css/main.b44d70b0.css.map",
-    "main.64cd249d.js.map": "/Azure-DevOps-Task-Creator/static/js/main.64cd249d.js.map"
+    "main.c4354ee9.js.map": "/Azure-DevOps-Task-Creator/static/js/main.c4354ee9.js.map"
   },
   "entrypoints": [
     "static/css/main.b44d70b0.css",
-    "static/js/main.64cd249d.js"
+    "static/js/main.c4354ee9.js"
   ]
 }
