@@ -2,11 +2,13 @@
 
 [![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/AhmedRashad15/Azure-DevOps-Task-Creator)
 
-A powerful React-based Azure DevOps extension for bulk task creation, management, and template automation under user stories in sprints.
+## Overview
+
+**Task Pilot** is an Azure DevOps extension that enables teams to efficiently create, manage, and template multiple tasks as children under user stories within sprints. It is designed to streamline bulk task creation and management directly inside Azure DevOps Boards.
 
 ---
 
-## 🚀 Features
+## ✨ Features
 - Fetch user stories from any sprint in your Azure DevOps project
 - Bulk create and assign tasks under user stories
 - Support for all standard and custom Azure DevOps fields (Priority, Severity, Activity, Estimates, etc.)
@@ -14,30 +16,45 @@ A powerful React-based Azure DevOps extension for bulk task creation, management
 - Save and load task templates (local or Azure DevOps cloud)
 - Robust handling of area/iteration paths for all team/project structures
 
-## 📦 Installation & Usage
+---
 
-1. **Install the Extension:**
-   - Go to your Azure DevOps organization settings > Extensions > Browse marketplace or upload the `.vsix` file.
-   - Or use the [GitHub repository](https://github.com/AhmedRashad15/Azure-DevOps-Task-Creator) for manual installation.
+## 🛠️ Installation
+
+1. **Upload the Extension:**
+   - Download the latest `.vsix` file from your build or release.
+   - Go to your Azure DevOps organization settings > Extensions > Manage extensions > Upload new extension.
+   - Select the `.vsix` file and follow the prompts to install.
 
 2. **Access Task Pilot:**
    - In your Azure DevOps project, hover over **Boards** in the sidebar and select **Task Pilot** from the list.
 
-3. **Configure and Use:**
-   - Enter your Personal Access Token, Organization, Project, and Sprint URL.
-   - Fetch user stories, add tasks (with all fields), and apply them in bulk.
+---
 
-## 📝 Contributing
+## 🚀 Usage
 
-Contributions are welcome! Please fork the repo and submit a pull request.
-
-## 📚 Documentation
-- See the in-app help and the [full usage guide in the repo](https://github.com/AhmedRashad15/Azure-DevOps-Task-Creator#readme)
-
-## 🛡️ Security
-- Never commit your Personal Access Token (PAT) to the repository.
-- Use environment variables or .env files for sensitive data in development.
+1. **Configure Azure DevOps Settings:**
+   - Enter your Personal Access Token (PAT)
+   - Provide your Organization Name, Project Name, and Sprint URL
+   - Click "Fetch User Stories"
+2. **Create Tasks:**
+   - Add task details (title, description, assigned to, Azure fields, custom fields)
+   - Save and load task templates as needed
+   - Click "Apply Tasks to All User Stories" to bulk-create tasks
+3. **Review Results:**
+   - Success and error details are shown in a modal after task creation
 
 ---
 
-For more details, visit the [GitHub repository](https://github.com/AhmedRashad15/Azure-DevOps-Task-Creator).
+## 🤝 Contributing
+
+Contributions are welcome! Please fork the repo and submit a pull request.
+
+---
+
+## 📚 Documentation & Support
+- For more details, see the [GitHub repository](https://github.com/AhmedRashad15/Azure-DevOps-Task-Creator)
+- For help, open an issue or contact the maintainer
+
+---
+
+© 2025 Ahmed Rashad. All rights reserved.
