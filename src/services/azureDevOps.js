@@ -45,8 +45,8 @@ class AzureDevOpsService {
       const sprintName = pathParts[pathParts.length - 1];
 
       console.log('DEBUG extractSprintName:', { teamName, sprintName });
-      return { sprintName, teamName };
-
+        return { sprintName, teamName };
+      
     } catch (error) {
       console.error("Error in extractSprintName:", error);
       throw new Error('Invalid URL format. Please provide a valid Azure DevOps sprint URL.');
@@ -59,15 +59,15 @@ class AzureDevOpsService {
       // Step 1: Extract sprint and team names.
       const { sprintName, teamName } = AzureDevOpsService.extractSprintName(sprintUrl);
       console.log(`Looking for sprint: "${sprintName}"`, teamName ? `for team: "${teamName}"` : '');
-
+        
       // Step 2: Get the list of iterations specifically for the team, if provided.
       let iterationsResponse;
-      if (teamName) {
+        if (teamName) {
         const encodedTeamName = encodeURIComponent(teamName);
         const teamIterationsUrl = `/${encodedTeamName}/_apis/work/teamsettings/iterations?api-version=7.0`;
         console.log(`Team found. Using team-specific iterations URL: ${teamIterationsUrl}`);
         iterationsResponse = await this.api.get(teamIterationsUrl);
-      } else {
+          } else {
         console.log('No team found. Using project-level iterations URL.');
         iterationsResponse = await this.api.get('/_apis/work/teamsettings/iterations?api-version=7.0');
       }
@@ -102,9 +102,9 @@ class AzureDevOpsService {
       let workItemIds = [];
       
       try {
-        const areaPath = teamName ? `${this.project}\\${teamName}` : this.project;
-        const query = `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${this.project}' AND [System.WorkItemType] = 'User Story' AND [System.IterationPath] = '${iterationPathForQuery}' AND [System.AreaPath] UNDER '${areaPath}' ORDER BY [System.Id]`;
-        
+      const areaPath = teamName ? `${this.project}\\${teamName}` : this.project;
+        const query = `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${this.project}' AND [System.WorkItemType] = 'User Story' AND [System.IterationPath] = '${iterationPathForQuery}' AND [System.AreaPath] UNDER '${areaPath}' AND [System.State] <> 'Closed' AND [System.State] <> 'Removed' ORDER BY [System.Id]`;
+      
         console.log('Attempting query with area path:', query);
         const wiqlResponse = await this.api.post('/_apis/wit/wiql', { query }, { params: { 'api-version': '7.0' } });
 
@@ -116,7 +116,7 @@ class AzureDevOpsService {
         if (error.response && error.response.data && error.response.data.message.includes('TF51011')) {
           console.warn(`Area path failed, as expected for some teams. Retrying without area path filter.`);
           
-          const fallbackQuery = `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${this.project}' AND [System.WorkItemType] = 'User Story' AND [System.IterationPath] = '${iterationPathForQuery}' ORDER BY [System.Id]`;
+          const fallbackQuery = `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${this.project}' AND [System.WorkItemType] = 'User Story' AND [System.IterationPath] = '${iterationPathForQuery}' AND [System.State] <> 'Closed' AND [System.State] <> 'Removed' ORDER BY [System.Id]`;
           
           console.log('Attempting fallback query:', fallbackQuery);
           const wiqlResponse = await this.api.post('/_apis/wit/wiql', { query: fallbackQuery }, { params: { 'api-version': '7.0' } });
@@ -266,37 +266,113 @@ class AzureDevOpsService {
     }
   }
 
+  // Fetch user info by email
+  async getUser(email) {
+    try {
+      const response = await this.api.get(`/../../_apis/identities`, {
+        params: {
+          searchFilter: 'General',
+          filterValue: email,
+          'api-version': '7.0'
+        }
+      });
+      if (response.data && response.data.value && response.data.value.length > 0) {
+        return response.data.value[0];
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+      return null;
+    }
+  }
+
   // Create multiple tasks for all user stories
   async createTasksForAllUserStories(userStories, tasks) {
-    if (!userStories || userStories.length === 0) {
-      return []; // Nothing to do if there are no user stories
-    }
-
-    // Get the iteration and area path from the first user story.
-    // We assume all user stories in the list share the same context from the sprint.
-    const { areaPath, iterationPath } = userStories[0];
-    console.log(`Using Area Path: "${areaPath}" and Iteration Path: "${iterationPath}" for all created tasks.`);
-
     const results = [];
-    for (const userStory of userStories) {
+
+    for (const story of userStories) {
+      // Defensive: If areaPath or iterationPath is missing, fetch details again
+      let areaPath = story.areaPath;
+      let iterationPath = story.iterationPath;
+      if (!areaPath || !iterationPath) {
+        try {
+          const details = await this.getWorkItemDetails([story.id]);
+          if (details && details.length > 0) {
+            areaPath = details[0].areaPath;
+            iterationPath = details[0].iterationPath;
+          }
+        } catch (e) {
+          // fallback to original values
+        }
+      }
       for (const task of tasks) {
         try {
-          // Use the unified paths derived from the first user story for all tasks
-          const createdTask = await this.createTask(userStory.id, task, areaPath, iterationPath);
+          // Build the patch document for the new task
+          const patchDocument = [
+            { op: 'add', path: '/fields/System.Title', value: task.title },
+            { op: 'add', path: '/fields/System.AreaPath', value: areaPath },
+            { op: 'add', path: '/fields/System.IterationPath', value: iterationPath },
+            {
+              op: 'add',
+              path: '/relations/-',
+              value: {
+                rel: 'System.LinkTypes.Hierarchy-Reverse',
+                url: story.url,
+                attributes: { comment: 'Parent User Story' },
+              },
+            },
+          ];
+
+          // If a user is assigned, find their identity and add it to the document
+          if (task.assignedTo) {
+            const user = await this.getUser(task.assignedTo);
+            if (user) {
+              patchDocument.push({
+                op: 'add',
+                path: '/fields/System.AssignedTo',
+                value: `${user.displayName} <${user.uniqueName}>`,
+              });
+            } else {
+              // Fallback: assign by email directly
+              patchDocument.push({
+                op: 'add',
+                path: '/fields/System.AssignedTo',
+                value: task.assignedTo,
+              });
+            }
+          }
+
+          // Add any other custom or standard fields
+          if (task.customFields) {
+            for (const [key, value] of Object.entries(task.customFields)) {
+              patchDocument.push({ op: 'add', path: `/fields/${key}`, value: value });
+            }
+          }
+
+          // Create the work item (task) using the REST API
+          const response = await this.api.post('/_apis/wit/workitems/$Task', patchDocument, {
+            params: {
+              'api-version': '7.0',
+            },
+            headers: {
+              'Content-Type': 'application/json-patch+json',
+            },
+          });
+
           results.push({
-            userStoryId: userStory.id,
-            userStoryTitle: userStory.title,
-            taskId: createdTask.id,
+            userStoryId: story.id,
+            userStoryTitle: story.title,
+            taskId: response.data.id,
             taskTitle: task.title,
-            status: 'success'
+            status: 'success',
           });
         } catch (error) {
           results.push({
-            userStoryId: userStory.id,
-            userStoryTitle: userStory.title,
+            userStoryId: story.id,
+            userStoryTitle: story.title,
             taskTitle: task.title,
             status: 'error',
-            error: error.message
+            error: error.message || 'Failed to create task',
           });
         }
       }

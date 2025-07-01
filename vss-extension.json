@@ -1,0 +1,43 @@
+{
+    "manifestVersion": 1,
+    "id": "task-pilot-custom",
+    "name": "TaskPilot: Automated Task Creator",
+    "version": "3.0.11",
+    "publisher": "AhmedRashad",
+    "description": "Automate and streamline Azure DevOps task creation under user stories in sprints.",
+    "details": {
+        "path": "README.md"
+    },
+    "categories": [
+        "Azure Repos",
+        "Azure Boards"
+    ],
+    "icons": {
+      "default": "build/logo.png"
+    },
+    "targets": [
+      {
+        "id": "Microsoft.VisualStudio.Services.Cloud"
+      }
+    ],
+    "contributions": [
+      {
+        "id": "task-pilot-hub",
+        "type": "ms.vss-web.hub",
+        "targets": [ "ms.vss-work-web.work-hub-group" ],
+        "scopes": [
+            "vso.work_write",
+            "vso.project_read"
+        ],
+        "properties": {
+          "name": "Task Pilot",
+          "uri": "build/index.html"
+        }
+      }
+    ],
+    "public": true,
+    "files": [
+      { "path": "build", "addressable": true },
+      { "path": "README.md", "addressable": true }
+    ]
+  }

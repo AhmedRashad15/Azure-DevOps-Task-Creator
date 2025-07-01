@@ -1,17 +1,18 @@
 {
   "name": "azure-tasks-creator",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "private": true,
-  "homepage": "https://AhmedRashad15.github.io/Azure-DevOps-Task-Creator",
+  "homepage": ".",
   "description": "Create tasks as children under user stories in Azure DevOps sprints",
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "cross-env INLINE_RUNTIME_CHUNK=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "package": "npm run build && tfx extension create --manifest-globs vss-extension.json --rev-version"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
@@ -19,6 +20,9 @@
     "@testing-library/user-event": "^13.5.0",
     "autoprefixer": "^10.4.16",
     "axios": "^1.4.0",
+    "azure-devops-extension-api": "^4.234.0",
+    "azure-devops-extension-sdk": "^3.1.2",
+    "azure-devops-ui": "^2.167.63",
     "lucide-react": "^0.263.1",
     "postcss": "^8.4.31",
     "react": "^18.2.0",
@@ -46,8 +50,26 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.21.8",
+    "@types/jest": "^26.0.3",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "gh-pages": "^5.0.0"
+    "copy-webpack-plugin": "^7.0.0",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.7.1",
+    "gh-pages": "^5.0.0",
+    "html-webpack-plugin": "^5.5.0",
+    "jest": "^26.1.0",
+    "jest-junit-reporter": "^1.1.0",
+    "mini-css-extract-plugin": "^2.9.2",
+    "rimraf": "~2.6.2",
+    "sass": "^1.62.1",
+    "sass-loader": "^13.0.0",
+    "tfx-cli": "^0.11.0",
+    "ts-jest": "^26.1.1",
+    "ts-loader": "~5.2.2",
+    "typescript": "^3.9.6",
+    "webpack": "^5.23.0",
+    "webpack-cli": "^5.1.4"
   }
 }

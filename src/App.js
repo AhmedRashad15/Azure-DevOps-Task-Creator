@@ -5,6 +5,7 @@ import TaskForm from './components/TaskForm';
 import TaskTemplates from './components/TaskTemplates';
 import UserStoriesList from './components/UserStoriesList';
 import ResultsModal from './components/ResultsModal';
+import TaskPilotLogo from './components/TaskPilotLogo';
 
 function App() {
   const [accessToken, setAccessToken] = useState('');
@@ -118,7 +119,7 @@ function App() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <h1 className="text-xl font-bold text-gray-900">Azure Tasks Creator</h1>
+                <TaskPilotLogo />
               </div>
             </div>
             <div className="flex items-center space-x-4">
