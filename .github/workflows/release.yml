@@ -1,0 +1,66 @@
+name: Build and Release Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:  # Allow manual trigger from GitHub Actions tab
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set version from tag (if tagged)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "Setting version to $VERSION"
+          node -e "const fs=require('fs');const p='vss-extension.json';const m=JSON.parse(fs.readFileSync(p,'utf8'));m.version='$VERSION';fs.writeFileSync(p,JSON.stringify(m,null,4));"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build extension
+        run: npm run build
+
+      - name: Package extension
+        run: npx tfx extension create --manifest-globs vss-extension.json --output-path .
+
+      - name: Get VSIX filename
+        id: vsix
+        run: |
+          VSIX=$(ls *.vsix 2>/dev/null | head -1)
+          echo "filename=$VSIX" >> $GITHUB_OUTPUT
+          echo "Created: $VSIX"
+
+      - name: Create GitHub Release (on tag push)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.vsix.outputs.filename }}
+          generate_release_notes: true
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload VSIX artifact (on manual run)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-vsix
+          path: ${{ steps.vsix.outputs.filename }}
